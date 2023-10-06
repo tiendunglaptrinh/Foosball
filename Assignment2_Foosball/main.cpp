@@ -1,5 +1,4 @@
 ﻿#include <SDL.h>
-#include <SDL_image.h>
 
 int main(int argc, char* argv[]) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -7,17 +6,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    
-    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
-        SDL_Log("IMG_Init Error: %s", IMG_GetError());
-        SDL_Quit();
-        return 1;
-    }
-
-    SDL_Window* window = SDL_CreateWindow("SDL2 Image Example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
+    SDL_Window* window = SDL_CreateWindow("Mini Soccer Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_SHOWN);
     if (!window) {
         SDL_Log("SDL_CreateWindow Error: %s", SDL_GetError());
-        IMG_Quit();
         SDL_Quit();
         return 1;
     }
@@ -26,21 +17,13 @@ int main(int argc, char* argv[]) {
     if (!renderer) {
         SDL_Log("SDL_CreateRenderer Error: %s", SDL_GetError());
         SDL_DestroyWindow(window);
-        IMG_Quit();
         SDL_Quit();
         return 1;
     }
 
-    SDL_Texture* backgroundTexture = IMG_LoadTexture(renderer, "background.png");
-    if (!backgroundTexture) {
-        SDL_Log("IMG_LoadTexture Error: %s", IMG_GetError());
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        IMG_Quit();
-        SDL_Quit();
-        return 1;
-    }
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 
+    // Game loop
     bool quit = false;
     SDL_Event event;
     while (!quit) {
@@ -51,14 +34,25 @@ int main(int argc, char* argv[]) {
         }
 
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, backgroundTexture, NULL, NULL);
+
+        SDL_Rect fieldRect = { 50, 50, 700, 500 };
+        SDL_RenderFillRect(renderer, &fieldRect);
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_Rect topBorder = { 50, 50, 700, 5 };
+        SDL_Rect bottomBorder = { 50, 545, 700, 5 };
+        SDL_Rect leftBorder = { 50, 50, 5, 500 };
+        SDL_Rect rightBorder = { 745, 50, 5, 500 };
+        SDL_RenderFillRect(renderer, &topBorder);
+        SDL_RenderFillRect(renderer, &bottomBorder);
+        SDL_RenderFillRect(renderer, &leftBorder);
+        SDL_RenderFillRect(renderer, &rightBorder);
+
         SDL_RenderPresent(renderer);
     }
 
-    SDL_DestroyTexture(backgroundTexture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-    IMG_Quit();
     SDL_Quit();
 
     return 0;
